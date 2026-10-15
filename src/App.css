@@ -285,6 +285,36 @@
   color: var(--text-soft);
 }
 
+.prompt-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.prompt-error {
+  margin: 0;
+  margin-right: auto;
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+
+.prompt-counter {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.prompt-counter--over {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.prompt-textarea[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
 .btn-generate {
   height: 52px;
   padding: 0 22px;
