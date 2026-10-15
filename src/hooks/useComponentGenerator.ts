@@ -1,8 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { GeneratedComponent, Provider } from '../types';
+import {
+  STORAGE_KEYS,
+  loadComponents,
+  loadHistory,
+  saveValue,
+  addToHistory,
+} from '../utils/persist';
 
 interface UseComponentGeneratorReturn {
   components: GeneratedComponent[];
+  history: string[];
   isLoading: boolean;
   error: string | null;
   generate: (prompt: string, apiKey: string | undefined, provider: Provider) => Promise<void>;
@@ -11,13 +19,23 @@ interface UseComponentGeneratorReturn {
 }
 
 export function useComponentGenerator(): UseComponentGeneratorReturn {
-  const [components, setComponents] = useState<GeneratedComponent[]>([]);
+  const [components, setComponents] = useState<GeneratedComponent[]>(loadComponents);
+  const [history, setHistory] = useState<string[]>(loadHistory);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    saveValue(STORAGE_KEYS.components, components);
+  }, [components]);
+
+  useEffect(() => {
+    saveValue(STORAGE_KEYS.history, history);
+  }, [history]);
 
   const generate = useCallback(async (prompt: string, apiKey: string | undefined, provider: Provider) => {
     setIsLoading(true);
     setError(null);
+    setHistory((prev) => addToHistory(prev, prompt));
 
     try {
       const res = await fetch('/api/generate', {
@@ -56,5 +74,5 @@ export function useComponentGenerator(): UseComponentGeneratorReturn {
     setComponents([]);
   }, []);
 
-  return { components, isLoading, error, generate, removeComponent, clearAll };
+  return { components, history, isLoading, error, generate, removeComponent, clearAll };
 }
